@@ -1,10 +1,9 @@
-package ch.martinelli.sudel.security;
+package app.sudel.security;
 
-import ch.martinelli.sudel.data.entity.User;
-import ch.martinelli.sudel.data.service.UserRepository;
+import app.sudel.data.entity.User;
+import app.sudel.data.service.UserRepository;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,6 +11,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 @Component
 public class AuthenticatedUser {

@@ -1,9 +1,7 @@
-package ch.martinelli.sudel.security;
+package app.sudel.security;
 
-import ch.martinelli.sudel.data.entity.User;
-import ch.martinelli.sudel.data.service.UserRepository;
-import java.util.List;
-import java.util.stream.Collectors;
+import app.sudel.data.entity.User;
+import app.sudel.data.service.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,6 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {

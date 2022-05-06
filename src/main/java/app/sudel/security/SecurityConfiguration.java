@@ -1,6 +1,6 @@
-package ch.martinelli.sudel.security;
+package app.sudel.security;
 
-import ch.martinelli.sudel.views.login.LoginView;
+import app.sudel.views.login.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurityConfigurerAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

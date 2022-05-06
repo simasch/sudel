@@ -1,9 +1,9 @@
-package ch.martinelli.sudel.views;
+package app.sudel.views;
 
-import ch.martinelli.sudel.data.entity.User;
-import ch.martinelli.sudel.security.AuthenticatedUser;
-import ch.martinelli.sudel.views.about.AboutView;
-import ch.martinelli.sudel.views.helloworld.HelloWorldView;
+import app.sudel.data.entity.User;
+import app.sudel.security.AuthenticatedUser;
+import app.sudel.views.about.AboutView;
+import app.sudel.views.helloworld.HelloWorldView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -23,6 +23,7 @@ import com.vaadin.flow.component.html.UnorderedList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
+
 import java.util.Optional;
 
 /**

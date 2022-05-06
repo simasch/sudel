@@ -1,4 +1,4 @@
-package ch.martinelli.sudel;
+package app.sudel;
 
 import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.page.AppShellConfigurator;

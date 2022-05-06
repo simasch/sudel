@@ -1,8 +1,8 @@
-package ch.martinelli.sudel.data.entity;
+package app.sudel.data.entity;
 
-import ch.martinelli.sudel.data.Role;
+import app.sudel.data.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.Set;
+
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -10,6 +10,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import java.util.Set;
 
 @Entity
 @Table(name = "application_user")

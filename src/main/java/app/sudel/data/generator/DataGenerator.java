@@ -1,16 +1,17 @@
-package ch.martinelli.sudel.data.generator;
+package app.sudel.data.generator;
 
-import ch.martinelli.sudel.data.Role;
-import ch.martinelli.sudel.data.entity.User;
-import ch.martinelli.sudel.data.service.UserRepository;
+import app.sudel.data.Role;
+import app.sudel.data.entity.User;
+import app.sudel.data.service.UserRepository;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import java.util.Collections;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Collections;
+import java.util.Set;
 
 @SpringComponent
 public class DataGenerator {

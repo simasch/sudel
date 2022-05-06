@@ -1,4 +1,4 @@
-package ch.martinelli.sudel.views.login;
+package app.sudel.views.login;
 
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginOverlay;
