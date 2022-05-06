@@ -1,9 +1,9 @@
-package app.sudel.security;
+package app.sudel.configuration.security;
 
-import app.sudel.data.entity.User;
-import app.sudel.data.service.UserRepository;
+import app.sudel.db.tables.records.SecurityUserRecord;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,14 +14,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+import static app.sudel.db.tables.SecurityUser.SECURITY_USER;
+
 @Component
 public class AuthenticatedUser {
 
-    private final UserRepository userRepository;
+    private final DSLContext ctx;
 
     @Autowired
-    public AuthenticatedUser(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public AuthenticatedUser(DSLContext ctx) {
+        this.ctx = ctx;
     }
 
     private Optional<Authentication> getAuthentication() {
@@ -30,8 +32,8 @@ public class AuthenticatedUser {
                 .filter(authentication -> !(authentication instanceof AnonymousAuthenticationToken));
     }
 
-    public Optional<User> get() {
-        return getAuthentication().map(authentication -> userRepository.findByUsername(authentication.getName()));
+    public Optional<SecurityUserRecord> get() {
+        return getAuthentication().map(authentication -> ctx.selectFrom(SECURITY_USER).where(SECURITY_USER.EMAIL.eq(authentication.getName())).fetchOne());
     }
 
     public void logout() {

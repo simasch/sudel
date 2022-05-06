@@ -19,10 +19,10 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 @Theme(value = "sudel")
 @PWA(name = "Sudel", shortName = "Sudel", offlineResources = {})
 @NpmPackage(value = "line-awesome", version = "1.3.0")
-public class Application extends SpringBootServletInitializer implements AppShellConfigurator {
+public class SudelApplication extends SpringBootServletInitializer implements AppShellConfigurator {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(SudelApplication.class, args);
     }
 
 }

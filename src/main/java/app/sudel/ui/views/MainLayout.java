@@ -1,9 +1,9 @@
-package app.sudel.views;
+package app.sudel.ui.views;
 
-import app.sudel.data.entity.User;
-import app.sudel.security.AuthenticatedUser;
-import app.sudel.views.about.AboutView;
-import app.sudel.views.helloworld.HelloWorldView;
+import app.sudel.configuration.security.AuthenticatedUser;
+import app.sudel.db.tables.records.SecurityUserRecord;
+import app.sudel.ui.views.about.AboutView;
+import app.sudel.ui.views.helloworld.HelloWorldView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -141,11 +141,11 @@ public class MainLayout extends AppLayout {
         Footer layout = new Footer();
         layout.addClassNames("footer");
 
-        Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
+        Optional<SecurityUserRecord> optionalSecurityUser = authenticatedUser.get();
+        if (optionalSecurityUser.isPresent()) {
+            SecurityUserRecord user = optionalSecurityUser.get();
 
-            Avatar avatar = new Avatar(user.getName(), user.getProfilePictureUrl());
+            Avatar avatar = new Avatar(user.getFirstName() + " " + user.getLastName());
             avatar.addClassNames("me-xs");
 
             ContextMenu userMenu = new ContextMenu(avatar);
@@ -154,7 +154,7 @@ public class MainLayout extends AppLayout {
                 authenticatedUser.logout();
             });
 
-            Span name = new Span(user.getName());
+            Span name = new Span(user.getFirstName() + " " + user.getLastName());
             name.addClassNames("font-medium", "text-s", "text-secondary");
 
             layout.add(avatar, name);

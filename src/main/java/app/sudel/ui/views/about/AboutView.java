@@ -1,6 +1,6 @@
-package app.sudel.views.about;
+package app.sudel.ui.views.about;
 
-import app.sudel.views.MainLayout;
+import app.sudel.ui.views.MainLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;

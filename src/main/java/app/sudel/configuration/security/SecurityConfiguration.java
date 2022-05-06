@@ -1,6 +1,6 @@
-package app.sudel.security;
+package app.sudel.configuration.security;
 
-import app.sudel.views.login.LoginView;
+import app.sudel.ui.views.login.LoginView;
 import com.vaadin.flow.spring.security.VaadinWebSecurityConfigurerAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +23,8 @@ public class SecurityConfiguration extends VaadinWebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
         super.configure(http);
+
         setLoginView(http, LoginView.class, LOGOUT_URL);
     }
 

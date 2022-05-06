@@ -1,6 +1,6 @@
-package app.sudel.views.helloworld;
+package app.sudel.ui.views.helloworld;
 
-import app.sudel.views.MainLayout;
+import app.sudel.ui.views.MainLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
