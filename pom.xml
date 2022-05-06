@@ -34,7 +34,7 @@
         <db.password>sudel</db.password>
         <db.driver>org.postgresql.Driver</db.driver>
 
-        <sonar.organization>simach</sonar.organization>
+        <sonar.organization>simasch</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <sonar.exclusions>src/main/java/app/sudel/SudelApplication.java</sonar.exclusions>
     </properties>
