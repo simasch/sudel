@@ -5,15 +5,13 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 
-import javax.annotation.security.RolesAllowed;
-
-@PageTitle("About")
-@Route(value = "about", layout = MainLayout.class)
-@RolesAllowed("ADMIN")
-public class AboutView extends VerticalLayout {
+@AnonymousAllowed
+@Route(layout = MainLayout.class)
+public class AboutView extends VerticalLayout implements HasDynamicTitle {
 
     public AboutView() {
         setSpacing(false);
@@ -31,4 +29,8 @@ public class AboutView extends VerticalLayout {
         getStyle().set("text-align", "center");
     }
 
+    @Override
+    public String getPageTitle() {
+        return getTranslation("about");
+    }
 }

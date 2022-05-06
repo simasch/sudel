@@ -3,7 +3,7 @@ package app.sudel.ui.views;
 import app.sudel.configuration.security.AuthenticatedUser;
 import app.sudel.db.tables.records.SecurityUserRecord;
 import app.sudel.ui.views.about.AboutView;
-import app.sudel.ui.views.helloworld.HelloWorldView;
+import app.sudel.ui.views.create.CreateView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -130,9 +130,9 @@ public class MainLayout extends AppLayout {
 
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
-                new MenuItemInfo("Hello World", "la la-globe", HelloWorldView.class), //
+                new MenuItemInfo(getTranslation("find.date"), "la la-globe", CreateView.class), //
 
-                new MenuItemInfo("About", "la la-file", AboutView.class), //
+                new MenuItemInfo(getTranslation("about"), "la la-file", AboutView.class), //
 
         };
     }
@@ -159,7 +159,7 @@ public class MainLayout extends AppLayout {
 
             layout.add(avatar, name);
         } else {
-            Anchor loginLink = new Anchor("login", "Sign in");
+            Anchor loginLink = new Anchor("login", getTranslation("sign.in"));
             layout.add(loginLink);
         }
 
