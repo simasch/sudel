@@ -20,7 +20,7 @@ import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Nav;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.html.UnorderedList;
-import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AccessAnnotationChecker;
 
@@ -173,7 +173,7 @@ public class MainLayout extends AppLayout {
     }
 
     private String getCurrentPageTitle() {
-        PageTitle title = getContent().getClass().getAnnotation(PageTitle.class);
-        return title == null ? "" : title.value();
+        HasDynamicTitle title = (HasDynamicTitle) getContent();
+        return title == null ? "" : title.getPageTitle();
     }
 }

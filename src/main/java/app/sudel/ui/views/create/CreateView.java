@@ -1,11 +1,13 @@
 package app.sudel.ui.views.create;
 
 import app.sudel.ui.views.MainLayout;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -24,7 +26,6 @@ import java.text.DateFormatSymbols;
 import java.time.DayOfWeek;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -40,8 +41,23 @@ public class CreateView extends VerticalLayout implements HasDynamicTitle {
         setId("create-view");
 
         TextField name = new TextField(getTranslation("event.name"));
+        name.setRequired(true);
+        name.setRequiredIndicatorVisible(true);
+
         TextField location = new TextField(getTranslation("event.location"));
+
         TextArea details = new TextArea(getTranslation("event.details"));
+
+        Button createPoll = new Button(getTranslation("create.poll"), e -> {
+            if (name.getValue().isBlank()) {
+                name.setInvalid(true);
+                Notification.show(getTranslation("name.required"));
+            } else {
+                name.setInvalid(false);
+            }
+        });
+
+        name.addValueChangeListener(e -> createPoll.setEnabled(!e.getValue().isBlank()));
 
         calendar = createCalendar();
         FormLayout toolbar = createToolbar();
@@ -49,7 +65,7 @@ public class CreateView extends VerticalLayout implements HasDynamicTitle {
         Div calenderWithToolbar = new Div(toolbar, calendar);
         calenderWithToolbar.setSizeFull();
 
-        add(new FormLayout(name, location, details), calenderWithToolbar);
+        add(new FormLayout(name, location, details, createPoll), calenderWithToolbar);
     }
 
     private FullCalendarScheduler createCalendar() {
@@ -57,7 +73,7 @@ public class CreateView extends VerticalLayout implements HasDynamicTitle {
         calendar.setSizeFull();
         calendar.setNowIndicatorShown(true);
         calendar.setTimezone(Timezone.getSystem());
-        calendar.setLocale(Locale.getDefault());
+        calendar.setLocale(UI.getCurrent().getLocale());
         calendar.setSchedulerLicenseKey("GPL-My-Project-Is-Open-Source");
 
         calendar.setFirstDay(DayOfWeek.MONDAY);
@@ -65,22 +81,26 @@ public class CreateView extends VerticalLayout implements HasDynamicTitle {
         calendar.addEntryClickedListener(event -> {
             if (event.getEntry().getRenderingMode() != Entry.RenderingMode.BACKGROUND
                     && event.getEntry().getRenderingMode() != Entry.RenderingMode.INVERSE_BACKGROUND) {
-                new CalendarEntryDialog(calendar, event.getEntry()).open();
+                new CalendarEntryDialog(event.getEntry(), false, entry -> {
+                }, entry -> {
+                }).open();
             }
         });
 
         calendar.addTimeslotsSelectedSchedulerListener(event -> {
-            ResourceEntry entry = new ResourceEntry();
+            ResourceEntry resourceEntry = new ResourceEntry();
 
-            entry.setStart(event.getStart());
+            resourceEntry.setStart(event.getStart());
             if (event.isAllDay()) {
-                entry.setEnd(event.getStart());
+                resourceEntry.setEnd(event.getStart());
             } else {
-                entry.setEnd(event.getEnd());
+                resourceEntry.setEnd(event.getEnd());
             }
-            entry.setAllDay(event.isAllDay());
+            resourceEntry.setAllDay(event.isAllDay());
 
-            new CalendarEntryDialog(calendar, entry).open();
+            new CalendarEntryDialog(resourceEntry, true, entry -> {
+            }, entry -> {
+            }).open();
         });
 
         return calendar;
@@ -99,12 +119,11 @@ public class CreateView extends VerticalLayout implements HasDynamicTitle {
         gotoDate.setWeekNumbersVisible(true);
 
         DatePicker.DatePickerI18n datePickerI18n = new DatePicker.DatePickerI18n();
-        DateFormatSymbols symbols = new DateFormatSymbols(Locale.getDefault());
+        DateFormatSymbols symbols = new DateFormatSymbols(UI.getCurrent().getLocale());
         datePickerI18n.setMonthNames(Arrays.asList(symbols.getMonths()));
         datePickerI18n.setFirstDayOfWeek(1);
         datePickerI18n.setWeekdays(Arrays.stream(symbols.getWeekdays()).filter(s -> !s.isEmpty()).collect(Collectors.toList()));
         datePickerI18n.setWeekdaysShort(Arrays.stream(symbols.getShortWeekdays()).filter(s -> !s.isEmpty()).collect(Collectors.toList()));
-        datePickerI18n.setDateFormats("dd.MM.yyyy", "dd.MM.yy", "ddMMyyyy", "ddMMyy");
         gotoDate.setI18n(datePickerI18n);
 
         Button buttonDatePicker = new Button("", VaadinIcon.CALENDAR.create());
@@ -154,5 +173,5 @@ public class CreateView extends VerticalLayout implements HasDynamicTitle {
             return clientSideValue;
         }
     }
-}
 
+}
