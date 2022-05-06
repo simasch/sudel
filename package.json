@@ -268,7 +268,6 @@
     "date-fns": "$date-fns",
     "lit": "$lit",
     "chokidar": "$chokidar",
-    "line-awesome": "$line-awesome",
     "@fullcalendar/core": "$@fullcalendar/core",
     "@fullcalendar/daygrid": "$@fullcalendar/daygrid",
     "@fullcalendar/interaction": "$@fullcalendar/interaction",
@@ -279,7 +278,8 @@
     "@fullcalendar/resource-timeline": "$@fullcalendar/resource-timeline",
     "@fullcalendar/timegrid": "$@fullcalendar/timegrid",
     "moment": "$moment",
-    "moment-timezone": "$moment-timezone"
+    "moment-timezone": "$moment-timezone",
+    "line-awesome": "$line-awesome"
   },
   "vaadin": {
     "dependencies": {

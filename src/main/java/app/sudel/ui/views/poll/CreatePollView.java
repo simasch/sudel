@@ -19,6 +19,7 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.vaadin.stefan.fullcalendar.CalendarView;
 import org.vaadin.stefan.fullcalendar.Entry;
 import org.vaadin.stefan.fullcalendar.FullCalendarScheduler;
@@ -46,6 +47,8 @@ public class CreatePollView extends VerticalLayout implements HasDynamicTitle {
     private final TextField name;
     private final TextField location;
     private final TextArea details;
+    private final TextArea participants;
+    private final Button createPoll;
 
     private EagerInMemoryEntryProvider<Entry> entryProvider;
 
@@ -67,10 +70,17 @@ public class CreatePollView extends VerticalLayout implements HasDynamicTitle {
 
         details = new TextArea(getTranslation("event.details"));
 
-        Button createPoll = new Button(getTranslation("create.poll"), e -> {
+        participants = new TextArea(getTranslation("event.participants"));
+        participants.setRequired(true);
+        participants.setRequiredIndicatorVisible(true);
+
+        createPoll = new Button(getTranslation("create.poll"), e -> {
             if (name.getValue().isBlank() || entryProvider.getEntries().isEmpty()) {
-                name.setInvalid(true);
-                Notification.show(getTranslation("name.and.entries.required"));
+                if (name.getValue().isBlank()) {
+                    name.setInvalid(true);
+                } else {
+                    Notification.show(getTranslation("dates.required"), 3000, Notification.Position.TOP_END);
+                }
             } else {
                 name.setInvalid(false);
 
@@ -79,7 +89,10 @@ public class CreatePollView extends VerticalLayout implements HasDynamicTitle {
         });
         createPoll.setEnabled(false);
 
-        name.addValueChangeListener(e -> createPoll.setEnabled(!e.getValue().isEmpty()));
+        name.addValueChangeListener(e -> this.validate());
+        participants.addValueChangeListener(e -> this.validate());
+
+        validate();
 
         Div calenderWithToolbar = new Div(toolbar, calendar);
         calenderWithToolbar.setHeightFull();
@@ -95,11 +108,35 @@ public class CreatePollView extends VerticalLayout implements HasDynamicTitle {
         HorizontalLayout calenderLayout = new HorizontalLayout(calenderWithToolbar, entryList);
         calenderLayout.setSizeFull();
 
-        add(new FormLayout(name, location, details, createPoll), calenderLayout);
+        add(new FormLayout(name, location, details, participants, createPoll), calenderLayout);
+    }
+
+    private void validate() {
+        name.setInvalid(name.getValue().isBlank());
+
+        if (!participants.getValue().isBlank()) {
+            if (participants.getValue().contains(";")) {
+                for (String participant : participants.getValue().split(";")) {
+                    if (!EmailValidator.getInstance().isValid(participant)) {
+                        participants.setInvalid(true);
+                        break;
+                    }
+                }
+            } else {
+                participants.setInvalid(!EmailValidator.getInstance().isValid(participants.getValue()));
+            }
+
+        } else {
+            participants.setInvalid(true);
+        }
+
+        createPoll.setEnabled(!name.getValue().isBlank() && !participants.getValue().isBlank());
     }
 
     private void createPoll() {
-        pollService.createPoll(name.getValue(), location.getValue(), details.getValue(), entryProvider.getEntries());
+        pollService.createPoll(name.getValue(), location.getValue(), details.getValue(), participants.getValue(), entryProvider.getEntries());
+
+        Notification.show(getTranslation("poll.created"), 3000, Notification.Position.TOP_END);
     }
 
     private FullCalendarScheduler createCalendar() {
