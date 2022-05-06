@@ -4,7 +4,7 @@ Find a date
 
 ## Local Development
 
-## Run Database
+### Run Database
 
     docker run --name postgres-sudel -d -p5432:5432 -e POSTGRES_DB=sudel -e POSTGRES_USER=sudel -e POSTGRES_PASSWORD=sudel -d postgres:12.7
 
