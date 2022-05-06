@@ -1,5 +1,6 @@
-package app.sudel.configuration.security;
+package app.sudel.service.security;
 
+import app.sudel.configuration.security.SecurityConfiguration;
 import app.sudel.db.tables.records.SecurityUserRecord;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
@@ -17,12 +18,12 @@ import java.util.Optional;
 import static app.sudel.db.tables.SecurityUser.SECURITY_USER;
 
 @Component
-public class AuthenticatedUser {
+public class SecurityService {
 
     private final DSLContext ctx;
 
     @Autowired
-    public AuthenticatedUser(DSLContext ctx) {
+    public SecurityService(DSLContext ctx) {
         this.ctx = ctx;
     }
 
@@ -32,7 +33,7 @@ public class AuthenticatedUser {
                 .filter(authentication -> !(authentication instanceof AnonymousAuthenticationToken));
     }
 
-    public Optional<SecurityUserRecord> get() {
+    public Optional<SecurityUserRecord> getUser() {
         return getAuthentication().map(authentication -> ctx.selectFrom(SECURITY_USER).where(SECURITY_USER.EMAIL.eq(authentication.getName())).fetchOne());
     }
 

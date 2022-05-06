@@ -1,4 +1,4 @@
-package app.sudel.ui.views.create;
+package app.sudel.ui.views.poll;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

@@ -1,5 +1,6 @@
-package app.sudel.ui.views.create;
+package app.sudel.ui.views.poll;
 
+import app.sudel.service.poll.PollService;
 import app.sudel.ui.views.MainLayout;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -8,10 +9,12 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
@@ -21,51 +24,82 @@ import org.vaadin.stefan.fullcalendar.Entry;
 import org.vaadin.stefan.fullcalendar.FullCalendarScheduler;
 import org.vaadin.stefan.fullcalendar.ResourceEntry;
 import org.vaadin.stefan.fullcalendar.Timezone;
+import org.vaadin.stefan.fullcalendar.dataprovider.EagerInMemoryEntryProvider;
+import org.vaadin.stefan.fullcalendar.dataprovider.EntryProvider;
 
 import java.text.DateFormatSymbols;
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 
 @AnonymousAllowed
 @RouteAlias(value = "", layout = MainLayout.class)
 @Route(layout = MainLayout.class)
-public class CreateView extends VerticalLayout implements HasDynamicTitle {
+public class CreatePollView extends VerticalLayout implements HasDynamicTitle {
 
     private final FullCalendarScheduler calendar;
+    private final VirtualList<Entry> entryList;
+    private final List<Entry> entries = new ArrayList<>();
+    private final TextField name;
+    private final TextField location;
+    private final TextArea details;
 
-    public CreateView() {
+    private EagerInMemoryEntryProvider<Entry> entryProvider;
+
+    private final PollService pollService;
+
+    public CreatePollView(PollService pollService) {
+        this.pollService = pollService;
+
         setId("create-view");
-
-        TextField name = new TextField(getTranslation("event.name"));
-        name.setRequired(true);
-        name.setRequiredIndicatorVisible(true);
-
-        TextField location = new TextField(getTranslation("event.location"));
-
-        TextArea details = new TextArea(getTranslation("event.details"));
-
-        Button createPoll = new Button(getTranslation("create.poll"), e -> {
-            if (name.getValue().isBlank()) {
-                name.setInvalid(true);
-                Notification.show(getTranslation("name.required"));
-            } else {
-                name.setInvalid(false);
-            }
-        });
-
-        name.addValueChangeListener(e -> createPoll.setEnabled(!e.getValue().isBlank()));
 
         calendar = createCalendar();
         FormLayout toolbar = createToolbar();
 
-        Div calenderWithToolbar = new Div(toolbar, calendar);
-        calenderWithToolbar.setSizeFull();
+        name = new TextField(getTranslation("event.name"));
+        name.setRequired(true);
+        name.setRequiredIndicatorVisible(true);
 
-        add(new FormLayout(name, location, details, createPoll), calenderWithToolbar);
+        location = new TextField(getTranslation("event.location"));
+
+        details = new TextArea(getTranslation("event.details"));
+
+        Button createPoll = new Button(getTranslation("create.poll"), e -> {
+            if (name.getValue().isBlank() || entryProvider.getEntries().isEmpty()) {
+                name.setInvalid(true);
+                Notification.show(getTranslation("name.and.entries.required"));
+            } else {
+                name.setInvalid(false);
+
+                createPoll();
+            }
+        });
+        createPoll.setEnabled(false);
+
+        name.addValueChangeListener(e -> createPoll.setEnabled(!e.getValue().isEmpty()));
+
+        Div calenderWithToolbar = new Div(toolbar, calendar);
+        calenderWithToolbar.setHeightFull();
+        calenderWithToolbar.setWidth("80%");
+
+        entryList = new VirtualList<>();
+        entryList.setWidthFull();
+        entryList.setRenderer(new EntryRenderer(this::removeEntry));
+        entryList.setItems(entries);
+        entryList.setWidth("20%");
+        entryList.setHeightFull();
+
+        HorizontalLayout calenderLayout = new HorizontalLayout(calenderWithToolbar, entryList);
+        calenderLayout.setSizeFull();
+
+        add(new FormLayout(name, location, details, createPoll), calenderLayout);
+    }
+
+    private void createPoll() {
+        pollService.createPoll(name.getValue(), location.getValue(), details.getValue(), entryProvider.getEntries());
     }
 
     private FullCalendarScheduler createCalendar() {
@@ -77,6 +111,10 @@ public class CreateView extends VerticalLayout implements HasDynamicTitle {
         calendar.setSchedulerLicenseKey("GPL-My-Project-Is-Open-Source");
 
         calendar.setFirstDay(DayOfWeek.MONDAY);
+        calendar.changeView(SudelCalendarView.TIME_GRID_WEEK);
+
+        entryProvider = EntryProvider.eagerInMemory();
+        calendar.setEntryProvider(entryProvider);
 
         calendar.addEntryClickedListener(event -> {
             if (event.getEntry().getRenderingMode() != Entry.RenderingMode.BACKGROUND
@@ -88,22 +126,32 @@ public class CreateView extends VerticalLayout implements HasDynamicTitle {
         });
 
         calendar.addTimeslotsSelectedSchedulerListener(event -> {
-            ResourceEntry resourceEntry = new ResourceEntry();
+            ResourceEntry entry = new ResourceEntry();
 
-            resourceEntry.setStart(event.getStart());
+            entry.setStart(event.getStart());
             if (event.isAllDay()) {
-                resourceEntry.setEnd(event.getStart());
+                entry.setEnd(event.getStart());
             } else {
-                resourceEntry.setEnd(event.getEnd());
+                entry.setEnd(event.getEnd());
             }
-            resourceEntry.setAllDay(event.isAllDay());
+            entry.setAllDay(event.isAllDay());
 
-            new CalendarEntryDialog(resourceEntry, true, entry -> {
-            }, entry -> {
-            }).open();
+            addEntry(entry);
         });
 
         return calendar;
+    }
+
+    private void addEntry(Entry entry) {
+        entries.add(entry);
+        entryList.getDataProvider().refreshAll();
+        entryProvider.addEntry(entry);
+    }
+
+    private void removeEntry(Entry entry) {
+        entries.remove(entry);
+        entryList.getDataProvider().refreshAll();
+        entryProvider.removeEntry(entry);
     }
 
     private FormLayout createToolbar() {
@@ -133,9 +181,9 @@ public class CreateView extends VerticalLayout implements HasDynamicTitle {
         Select<SudelCalendarView> select = new Select<>();
         select.setWidthFull();
         select.setItems(List.of(SudelCalendarView.values()));
-        select.setValue(SudelCalendarView.DAY_GRID_MONTH);
+        select.setValue(SudelCalendarView.TIME_GRID_WEEK);
         select.setItemLabelGenerator(sudelCalendarView -> getTranslation(sudelCalendarView.getName()));
-        select.addValueChangeListener(e -> calendar.changeView(Objects.requireNonNullElse(e.getValue(), SudelCalendarView.DAY_GRID_MONTH)));
+        select.addValueChangeListener(e -> calendar.changeView(e.getValue()));
 
         FormLayout toolbar = new FormLayout(buttonToday, buttonPrevious, buttonNext, buttonDatePicker, select);
 

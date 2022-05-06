@@ -1,9 +1,9 @@
 package app.sudel.ui.views;
 
-import app.sudel.configuration.security.AuthenticatedUser;
 import app.sudel.db.tables.records.SecurityUserRecord;
+import app.sudel.service.security.SecurityService;
 import app.sudel.ui.views.about.AboutView;
-import app.sudel.ui.views.create.CreateView;
+import app.sudel.ui.views.poll.CreatePollView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -73,11 +73,11 @@ public class MainLayout extends AppLayout {
 
     private H1 viewTitle;
 
-    private AuthenticatedUser authenticatedUser;
+    private SecurityService securityService;
     private AccessAnnotationChecker accessChecker;
 
-    public MainLayout(AuthenticatedUser authenticatedUser, AccessAnnotationChecker accessChecker) {
-        this.authenticatedUser = authenticatedUser;
+    public MainLayout(SecurityService securityService, AccessAnnotationChecker accessChecker) {
+        this.securityService = securityService;
         this.accessChecker = accessChecker;
 
         setPrimarySection(Section.DRAWER);
@@ -130,7 +130,7 @@ public class MainLayout extends AppLayout {
 
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
-                new MenuItemInfo(getTranslation("find.date"), "la la-globe", CreateView.class), //
+                new MenuItemInfo(getTranslation("find.date"), "la la-globe", CreatePollView.class), //
 
                 new MenuItemInfo(getTranslation("about"), "la la-file", AboutView.class), //
 
@@ -141,7 +141,7 @@ public class MainLayout extends AppLayout {
         Footer layout = new Footer();
         layout.addClassNames("footer");
 
-        Optional<SecurityUserRecord> optionalSecurityUser = authenticatedUser.get();
+        Optional<SecurityUserRecord> optionalSecurityUser = securityService.getUser();
         if (optionalSecurityUser.isPresent()) {
             SecurityUserRecord user = optionalSecurityUser.get();
 
@@ -151,7 +151,7 @@ public class MainLayout extends AppLayout {
             ContextMenu userMenu = new ContextMenu(avatar);
             userMenu.setOpenOnClick(true);
             userMenu.addItem("Logout", e -> {
-                authenticatedUser.logout();
+                securityService.logout();
             });
 
             Span name = new Span(user.getFirstName() + " " + user.getLastName());

@@ -1,4 +1,4 @@
-package app.sudel.configuration.security;
+package app.sudel.service.security;
 
 import org.jooq.DSLContext;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

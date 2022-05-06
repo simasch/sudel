@@ -1,4 +1,4 @@
-package app.sudel.ui.views.create;
+package app.sudel.ui.views.poll;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.customfield.CustomField;
