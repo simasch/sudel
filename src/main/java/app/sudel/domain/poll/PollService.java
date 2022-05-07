@@ -29,8 +29,8 @@ public class PollService {
 
         for (Entry calendarEntry : pollEntity.getCalendarEntries()) {
             PollDateRecord pollDateRecord = ctx.newRecord(POLL_DATE);
-            pollDateRecord.setStartsAt(calendarEntry.getStart());
-            pollDateRecord.setEndsAt(calendarEntry.getEnd());
+            pollDateRecord.setStartsAt(calendarEntry.getStartWithOffset());
+            pollDateRecord.setEndsAt(calendarEntry.getEndWithOffset());
             pollDateRecord.setAllDay(calendarEntry.isAllDay());
             pollDateRecord.setPollId(pollRecord.getId());
             pollDateRecord.store();

@@ -5,6 +5,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.ElementFactory;
 import org.vaadin.stefan.fullcalendar.Entry;
 
@@ -30,12 +31,8 @@ public class EntryRenderer extends ComponentRenderer<HorizontalLayout, Entry> {
         VerticalLayout infoLayout = new VerticalLayout();
         infoLayout.setSpacing(false);
         infoLayout.setPadding(false);
-        infoLayout.getElement().appendChild(ElementFactory.createStrong(
-                DATE_FORMATTER.format(entry.getStart()) +
-                        " " +
-                        TIME_FORMATTER.format(entry.getStart()) +
-                        " - " +
-                        TIME_FORMATTER.format(entry.getEnd())));
+
+        infoLayout.getElement().appendChild(createDateTimeInfo(entry));
 
         cardLayout.add(infoLayout);
 
@@ -44,5 +41,20 @@ public class EntryRenderer extends ComponentRenderer<HorizontalLayout, Entry> {
 
         cardLayout.add(deleteIcon);
         return cardLayout;
+    }
+
+    private Element createDateTimeInfo(Entry entry) {
+        Element dateTimeInfo;
+        if (entry.isAllDay()) {
+            dateTimeInfo = Element.createText(DATE_FORMATTER.format(entry.getStartWithOffset()));
+        } else {
+            dateTimeInfo = ElementFactory.createStrong(
+                    DATE_FORMATTER.format(entry.getStartWithOffset()) +
+                            " " +
+                            TIME_FORMATTER.format(entry.getStartWithOffset()) +
+                            " - " +
+                            TIME_FORMATTER.format(entry.getEndWithOffset()));
+        }
+        return dateTimeInfo;
     }
 }

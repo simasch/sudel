@@ -17,11 +17,11 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.virtuallist.VirtualList;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.validator.StringLengthValidator;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.apache.commons.lang3.StringUtils;
 import org.vaadin.stefan.fullcalendar.CalendarView;
 import org.vaadin.stefan.fullcalendar.Entry;
 import org.vaadin.stefan.fullcalendar.FullCalendarScheduler;
@@ -61,7 +61,7 @@ public class CreatePollView extends VerticalLayout implements HasDynamicTitle {
         TextField name = new TextField(getTranslation("event.name"));
         binder.forField(name)
                 .asRequired()
-                .withValidator(StringUtils::isNotBlank, getTranslation("name.required"))
+                .withValidator(new StringLengthValidator(getTranslation("name.required"), 1, 200))
                 .bind(PollEntity::getName, PollEntity::setName);
 
         TextField location = new TextField(getTranslation("event.location"));
@@ -120,20 +120,18 @@ public class CreatePollView extends VerticalLayout implements HasDynamicTitle {
         calendar.addEntryClickedListener(event -> {
             if (event.getEntry().getRenderingMode() != Entry.RenderingMode.BACKGROUND
                     && event.getEntry().getRenderingMode() != Entry.RenderingMode.INVERSE_BACKGROUND) {
-                new CalendarEntryDialog(event.getEntry(), false, entry -> {
-                }, entry -> {
-                }).open();
+                new CalendarEntryDialog(event.getEntry(), entry -> entryList.getDataProvider().refreshAll(), this::removeEntry).open();
             }
         });
 
         calendar.addTimeslotsSelectedSchedulerListener(event -> {
             ResourceEntry entry = new ResourceEntry();
 
-            entry.setStart(event.getStart());
+            entry.setStart(event.getStartWithOffset());
             if (event.isAllDay()) {
-                entry.setEnd(event.getStart());
+                entry.setEnd(event.getStartWithOffset());
             } else {
-                entry.setEnd(event.getEnd());
+                entry.setEnd(event.getEndWithOffset());
             }
             entry.setAllDay(event.isAllDay());
 
