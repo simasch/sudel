@@ -1,6 +1,5 @@
-package app.sudel.service.security;
+package app.sudel.configuration.security;
 
-import app.sudel.configuration.security.SecurityConfiguration;
 import app.sudel.db.tables.records.SecurityUserRecord;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;

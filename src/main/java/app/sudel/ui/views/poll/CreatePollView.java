@@ -1,25 +1,27 @@
 package app.sudel.ui.views.poll;
 
-import app.sudel.service.poll.PollService;
+import app.sudel.domain.poll.PollEntity;
+import app.sudel.domain.poll.PollService;
 import app.sudel.ui.views.MainLayout;
+import app.sudel.ui.views.components.SudelNotification;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.virtuallist.VirtualList;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.commons.lang3.StringUtils;
 import org.vaadin.stefan.fullcalendar.CalendarView;
 import org.vaadin.stefan.fullcalendar.Entry;
 import org.vaadin.stefan.fullcalendar.FullCalendarScheduler;
@@ -44,55 +46,45 @@ public class CreatePollView extends VerticalLayout implements HasDynamicTitle {
     private final FullCalendarScheduler calendar;
     private final VirtualList<Entry> entryList;
     private final List<Entry> entries = new ArrayList<>();
-    private final TextField name;
-    private final TextField location;
-    private final TextArea details;
-    private final TextArea participants;
-    private final Button createPoll;
 
     private EagerInMemoryEntryProvider<Entry> entryProvider;
 
-    private final PollService pollService;
-
     public CreatePollView(PollService pollService) {
-        this.pollService = pollService;
-
         setId("create-view");
 
         calendar = createCalendar();
+
+        Binder<PollEntity> binder = new Binder<>(PollEntity.class);
+
         FormLayout toolbar = createToolbar();
 
-        name = new TextField(getTranslation("event.name"));
-        name.setRequired(true);
-        name.setRequiredIndicatorVisible(true);
+        TextField name = new TextField(getTranslation("event.name"));
+        binder.forField(name)
+                .asRequired()
+                .withValidator(StringUtils::isNotBlank, getTranslation("name.required"))
+                .bind(PollEntity::getName, PollEntity::setName);
 
-        location = new TextField(getTranslation("event.location"));
+        TextField location = new TextField(getTranslation("event.location"));
+        binder.forField(location).bind(PollEntity::getLocation, PollEntity::setLocation);
 
-        details = new TextArea(getTranslation("event.details"));
+        TextArea details = new TextArea(getTranslation("event.details"));
+        binder.forField(details).bind(PollEntity::getDescription, PollEntity::setDescription);
 
-        participants = new TextArea(getTranslation("event.participants"));
-        participants.setRequired(true);
-        participants.setRequiredIndicatorVisible(true);
+        binder.setBean(new PollEntity());
 
-        createPoll = new Button(getTranslation("create.poll"), e -> {
-            if (name.getValue().isBlank() || entryProvider.getEntries().isEmpty()) {
-                if (name.getValue().isBlank()) {
-                    name.setInvalid(true);
-                } else {
-                    Notification.show(getTranslation("dates.required"), 3000, Notification.Position.TOP_END);
-                }
-            } else {
-                name.setInvalid(false);
+        Button createPoll = new Button(getTranslation("create.poll"), e -> {
+            PollEntity pollEntity = binder.getBean();
+            pollEntity.setCalendarEntries(entryProvider.getEntries());
 
-                createPoll();
+            if (pollEntity.getCalendarEntries().isEmpty()) {
+                SudelNotification.showError("dates.required");
+            }
+            if (binder.validate().isOk() && !pollEntity.getCalendarEntries().isEmpty()) {
+                pollService.createPoll(pollEntity);
+
+                SudelNotification.showSuccess("poll.created");
             }
         });
-        createPoll.setEnabled(false);
-
-        name.addValueChangeListener(e -> this.validate());
-        participants.addValueChangeListener(e -> this.validate());
-
-        validate();
 
         Div calenderWithToolbar = new Div(toolbar, calendar);
         calenderWithToolbar.setHeightFull();
@@ -108,35 +100,7 @@ public class CreatePollView extends VerticalLayout implements HasDynamicTitle {
         HorizontalLayout calenderLayout = new HorizontalLayout(calenderWithToolbar, entryList);
         calenderLayout.setSizeFull();
 
-        add(new FormLayout(name, location, details, participants, createPoll), calenderLayout);
-    }
-
-    private void validate() {
-        name.setInvalid(name.getValue().isBlank());
-
-        if (!participants.getValue().isBlank()) {
-            if (participants.getValue().contains(";")) {
-                for (String participant : participants.getValue().split(";")) {
-                    if (!EmailValidator.getInstance().isValid(participant)) {
-                        participants.setInvalid(true);
-                        break;
-                    }
-                }
-            } else {
-                participants.setInvalid(!EmailValidator.getInstance().isValid(participants.getValue()));
-            }
-
-        } else {
-            participants.setInvalid(true);
-        }
-
-        createPoll.setEnabled(!name.getValue().isBlank() && !participants.getValue().isBlank());
-    }
-
-    private void createPoll() {
-        pollService.createPoll(name.getValue(), location.getValue(), details.getValue(), participants.getValue(), entryProvider.getEntries());
-
-        Notification.show(getTranslation("poll.created"), 3000, Notification.Position.TOP_END);
+        add(new FormLayout(name, location, details, createPoll), calenderLayout);
     }
 
     private FullCalendarScheduler createCalendar() {

@@ -1,11 +1,11 @@
 package app.sudel.ui.views.poll;
 
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.dom.ElementFactory;
 import org.vaadin.stefan.fullcalendar.Entry;
 
 import java.time.format.DateTimeFormatter;
@@ -24,17 +24,25 @@ public class EntryRenderer extends ComponentRenderer<HorizontalLayout, Entry> {
 
     @Override
     public HorizontalLayout createComponent(Entry entry) {
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.setWidthFull();
-        horizontalLayout.setSpacing(true);
-        horizontalLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        HorizontalLayout cardLayout = new HorizontalLayout();
+        cardLayout.setMargin(true);
 
-        horizontalLayout.add(new Span(DATE_FORMATTER.format(entry.getStart()) + " " + TIME_FORMATTER.format(entry.getStart()) + " - " + TIME_FORMATTER.format(entry.getEnd())));
+        VerticalLayout infoLayout = new VerticalLayout();
+        infoLayout.setSpacing(false);
+        infoLayout.setPadding(false);
+        infoLayout.getElement().appendChild(ElementFactory.createStrong(
+                DATE_FORMATTER.format(entry.getStart()) +
+                        " " +
+                        TIME_FORMATTER.format(entry.getStart()) +
+                        " - " +
+                        TIME_FORMATTER.format(entry.getEnd())));
+
+        cardLayout.add(infoLayout);
 
         Icon deleteIcon = VaadinIcon.TRASH.create();
         deleteIcon.addClickListener(e -> onDelete.accept(entry));
-        horizontalLayout.add(deleteIcon);
 
-        return horizontalLayout;
+        cardLayout.add(deleteIcon);
+        return cardLayout;
     }
 }

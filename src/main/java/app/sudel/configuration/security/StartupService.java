@@ -1,4 +1,4 @@
-package app.sudel.service.security;
+package app.sudel.configuration.security;
 
 import org.jooq.DSLContext;
 import org.slf4j.Logger;

@@ -1,7 +1,7 @@
 package app.sudel.ui.views;
 
+import app.sudel.configuration.security.SecurityService;
 import app.sudel.db.tables.records.SecurityUserRecord;
-import app.sudel.service.security.SecurityService;
 import app.sudel.ui.views.about.AboutView;
 import app.sudel.ui.views.poll.CreatePollView;
 import com.vaadin.flow.component.Component;
