@@ -120,22 +120,36 @@ public class CreatePollView extends VerticalLayout implements HasDynamicTitle {
         calendar.addEntryClickedListener(event -> {
             if (event.getEntry().getRenderingMode() != Entry.RenderingMode.BACKGROUND
                     && event.getEntry().getRenderingMode() != Entry.RenderingMode.INVERSE_BACKGROUND) {
-                new CalendarEntryDialog(event.getEntry(), entry -> entryList.getDataProvider().refreshAll(), this::removeEntry).open();
+                new CalendarEntryDialog(event.getEntry(), entry -> {
+                    entryProvider.updateEntry(entry);
+                    entryList.getDataProvider().refreshAll();
+                }, this::removeEntry).open();
             }
         });
 
         calendar.addTimeslotsSelectedSchedulerListener(event -> {
             ResourceEntry entry = new ResourceEntry();
-
-            entry.setStart(event.getStartWithOffset());
+            entry.setStart(event.getStart());
             if (event.isAllDay()) {
-                entry.setEnd(event.getStartWithOffset());
+                entry.setEnd(event.getStart());
             } else {
-                entry.setEnd(event.getEndWithOffset());
+                entry.setEnd(event.getEnd());
             }
             entry.setAllDay(event.isAllDay());
 
             addEntry(entry);
+        });
+
+        calendar.addEntryResizedListener(event -> {
+            event.getEntry().setEnd(event.getDelta().applyOn(event.getEntry().getEnd()));
+            entryList.getDataProvider().refreshAll();
+        });
+
+        calendar.addEntryDroppedSchedulerListener(event -> {
+            Entry entry = event.applyChangesOnEntry();
+            entryProvider.updateEntry(entry);
+
+            entryList.getDataProvider().refreshAll();
         });
 
         return calendar;

@@ -51,7 +51,7 @@ public class EntryRenderer extends ComponentRenderer<HorizontalLayout, Entry> {
                 div.add(new Span(DATE_FORMATTER.format(entry.getStartWithOffset())));
             } else {
                 div.add(new Span(DATE_FORMATTER.format(entry.getStartWithOffset()) +
-                        " - " +
+                        "  - " +
                         DATE_FORMATTER.format(entry.getEndWithOffset())));
             }
         } else {

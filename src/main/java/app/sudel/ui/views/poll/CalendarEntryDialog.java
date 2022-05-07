@@ -57,7 +57,6 @@ public class CalendarEntryDialog extends Dialog {
 
         componentsLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.STRETCH);
         componentsLayout.setSizeFull();
-        componentsLayout.setSpacing(false);
 
         fieldAllDay.addValueChangeListener(event -> {
             fieldStart.setDateOnly(event.getValue());
@@ -72,8 +71,8 @@ public class CalendarEntryDialog extends Dialog {
 
         binder = new Binder<>(Entry.class);
 
-        binder.forField(fieldStart).asRequired().bind(Entry::getStart, Entry::setStart);
-        binder.forField(fieldEnd).asRequired().bind(Entry::getEnd, Entry::setEnd);
+        binder.forField(fieldStart).asRequired().bind(Entry::getStartWithOffset, Entry::setStartWithOffset);
+        binder.forField(fieldEnd).asRequired().bind(Entry::getEndWithOffset, Entry::setEndWithOffset);
         binder.forField(fieldAllDay).bind(Entry::isAllDay, Entry::setAllDay);
 
         binder.setBean(entry);
@@ -125,7 +124,7 @@ public class CalendarEntryDialog extends Dialog {
                 // to prevent accidentally "disappearing" days
                 entry.setEnd(entry.getEnd().plusDays(1));
             }
-            onSave.accept(this.entry);
+            onSave.accept(entry);
             close();
         }
     }
