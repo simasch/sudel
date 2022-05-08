@@ -407,8 +407,8 @@
     "@fullcalendar/resource-timeline": "$@fullcalendar/resource-timeline",
     "@fullcalendar/timegrid": "$@fullcalendar/timegrid",
     "date-fns": "$date-fns",
-    "line-awesome": "$line-awesome",
     "moment": "$moment",
-    "moment-timezone": "$moment-timezone"
+    "moment-timezone": "$moment-timezone",
+    "line-awesome": "$line-awesome"
   }
 }

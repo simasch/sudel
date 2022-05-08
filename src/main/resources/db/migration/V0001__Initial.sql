@@ -1,42 +1,42 @@
-CREATE SEQUENCE security_group_seq;
+create sequence security_group_seq;
 
-CREATE TABLE security_group
+create table security_group
 (
-    id   bigint       NOT NULL DEFAULT NEXTVAL('security_group_seq') PRIMARY KEY,
+    id   bigint       not null default nextval('security_group_seq') primary key,
 
-    name varchar(255) NOT NULL
+    name varchar(255) not null
 );
 
-ALTER TABLE security_group
-    ADD CONSTRAINT uk_security_group_name UNIQUE (name);
+alter table security_group
+    add constraint uk_security_group_name unique (name);
 
-CREATE SEQUENCE security_user_seq;
+create sequence security_user_seq;
 
-CREATE TABLE security_user
+create table security_user
 (
-    id              bigint       NOT NULL DEFAULT NEXTVAL('security_user_seq') PRIMARY KEY,
+    id              bigint       not null default nextval('security_user_seq') primary key,
 
-    first_name      varchar(255) NOT NULL,
-    last_name       varchar(255) NOT NULL,
-    email           varchar(255) NOT NULL,
-    secret          varchar(255) NOT NULL,
+    first_name      varchar(255) not null,
+    last_name       varchar(255) not null,
+    email           varchar(255) not null,
+    secret          varchar(255) not null,
 
     confirmation_id varchar(255),
-    confirmed       boolean               DEFAULT false
+    confirmed       boolean               default false
 );
 
-ALTER TABLE security_user
-    ADD CONSTRAINT uk_security_user_email UNIQUE (email);
+alter table security_user
+    add constraint uk_security_user_email unique (email);
 
-CREATE TABLE user_group
+create table user_group
 (
-    user_id  bigint NOT NULL,
-    group_id bigint NOT NULL
+    user_id  bigint not null,
+    group_id bigint not null
 );
 
-ALTER TABLE user_group
-    ADD PRIMARY KEY (group_id, user_id);
-ALTER TABLE user_group
-    ADD CONSTRAINT fk_user_group_user FOREIGN KEY (user_id) REFERENCES security_user (id);
-ALTER TABLE user_group
-    ADD CONSTRAINT fk_user_group_group FOREIGN KEY (group_id) REFERENCES security_group (id);
+alter table user_group
+    add primary key (group_id, user_id);
+alter table user_group
+    add constraint fk_user_group_user foreign key (user_id) references security_user (id);
+alter table user_group
+    add constraint fk_user_group_group foreign key (group_id) references security_group (id);

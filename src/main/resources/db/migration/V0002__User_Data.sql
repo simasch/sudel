@@ -1,3 +1,3 @@
-INSERT INTO security_group (id, name) VALUES(1, 'ADMIN');
-INSERT INTO security_group (id, name) VALUES(2, 'USER');
-INSERT INTO security_group (id, name) VALUES(3, 'ACTUATOR');
+insert into security_group (id, name) values(1, 'ADMIN');
+insert into security_group (id, name) values(2, 'USER');
+insert into security_group (id, name) values(3, 'ACTUATOR');

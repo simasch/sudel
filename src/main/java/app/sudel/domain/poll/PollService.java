@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.stefan.fullcalendar.Entry;
 
+import java.time.ZoneOffset;
+import java.util.UUID;
+
 import static app.sudel.db.tables.Poll.POLL;
 import static app.sudel.db.tables.PollDate.POLL_DATE;
 
@@ -22,6 +25,7 @@ public class PollService {
     @Transactional
     public void createPoll(PollEntity pollEntity) {
         PollRecord pollRecord = ctx.newRecord(POLL);
+        pollRecord.setPollKey(UUID.randomUUID());
         pollRecord.setName(pollEntity.getName());
         pollRecord.setLocation(pollEntity.getLocation());
         pollRecord.setDescription(pollEntity.getDescription());
@@ -29,8 +33,8 @@ public class PollService {
 
         for (Entry calendarEntry : pollEntity.getCalendarEntries()) {
             PollDateRecord pollDateRecord = ctx.newRecord(POLL_DATE);
-            pollDateRecord.setStartsAt(calendarEntry.getStartWithOffset());
-            pollDateRecord.setEndsAt(calendarEntry.getEndWithOffset());
+            pollDateRecord.setStartsAt(calendarEntry.getStart().atOffset(ZoneOffset.UTC));
+            pollDateRecord.setEndsAt(calendarEntry.getEnd().atOffset(ZoneOffset.UTC));
             pollDateRecord.setAllDay(calendarEntry.isAllDay());
             pollDateRecord.setPollId(pollRecord.getId());
             pollDateRecord.store();
